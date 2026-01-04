@@ -187,6 +187,9 @@ _speedups.html
 # pyenv
 .python-version
 
+#codeforces stuff
+codeforces.yaml
+
 #undertale stuff
 /Undertale/
 

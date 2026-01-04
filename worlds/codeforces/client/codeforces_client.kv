@@ -1,0 +1,135 @@
+#:import webbrowser webbrowser
+
+<ConfettiView>:
+    size_hint: None, None
+    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+    spacing: 0
+    padding: 0
+
+<CodeforcesGameView>:
+    FloatLayout:
+        id: float_container
+        size_hint: 1, 1
+
+
+        BoxLayout:
+            id: game_container
+            orientation: "vertical"
+            size_hint: 1, 1
+
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            canvas.after:
+                Color:
+                    rgba: 1, 0.4, 1, 1
+                Line:
+                    width: 3
+                    rectangle: self.x, self.y, self.width, self.height
+
+            id: notif_area
+            text: root.notif_text
+            markup: True
+            size_hint_x: 0.8
+            size_hint_y: 50 / root.height
+            pos: root.width * 0.1, root.height + 25 - 100 * root.notif_pos
+            opacity: root.notif_pos
+
+<CodeforcesProblemHeader>:
+    padding: 10
+    spacing: 5
+    height: 50
+    orientation: "horizontal"
+    size_hint: 1, None
+
+<CodeforcesUpgradeList>:
+    height: 36
+    orientation: "horizontal"
+    size_hint: 1, None
+
+    Label:
+        size_hint: 0.5, 1
+        text: "Memory: " + root.memory_string
+        valign: "middle"
+
+    Label:
+        size_hint: 0.5, 1
+        text: f"Time: {root.time_mult}x"
+        valign: "middle"
+
+<CodeforcesLabel>:
+    orientation: "horizontal"
+    padding: 10
+    spacing: 5
+    size_hint_x: 1
+    size_hint_y: None
+
+    canvas.before:
+        Color:
+            rgba: (0.2, 0.2, 0.2, 0.4) if root.problem_state == "HIDDEN" else ((0.6, 0.6, 0.6, 0.4) if root.problem_state == "AVAILABLE" else ((0.2, 0.9, 0.2, 0.6) if root.problem_state == "FULL_SOLVED" else ((0.3, 0.3, 0.8, 0.4) if root.problem_state == "CLEARED" else (0.2, 0.2, 0.6, 0.2))))
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        size_hint: 0.8, 1
+        valign: "middle"
+        halign: "left"
+        text_size: self.size
+        text: "Locked" if root.problem_state in ["HIDDEN", "CLEARED_HIDDEN"] else root.problem_name
+
+    Button:
+        size_hint: 0.15, 1
+        valign: "middle"
+        text: "CF"
+        on_release: webbrowser.open(root.problem_url)
+        disabled: root.problem_state in ["HIDDEN", "CLEARED_HIDDEN"]
+        opacity: 0 if root.problem_state in ["HIDDEN", "CLEARED_HIDDEN"] else 1
+
+
+<CodeforcesProblemBox>:
+    cols: 1
+    viewclass: "CodeforcesLabel"
+    scroll_type: ["content", "bars"]
+    bar_width: dp(12)
+    effect_cls: "ScrollEffect"
+    size_hint_y: 1
+    SelectableRecycleBoxLayout:
+        default_size: None, dp(50)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: "vertical"
+        spacing: dp(5)
+        padding: dp(10)
+
+<CodeforcesProblemTopBoxes>:
+    rows: 1
+    viewclass: "CodeforcesPreview"
+    size_hint_x: 1
+    size_hint_y: None
+    height: dp(60)
+    SelectableRecycleBoxLayout:
+        default_size: None, dp(50)
+        default_size_hint: 1, None
+        height: self.minimum_height
+        orientation: "horizontal"
+        spacing: dp(3)
+        padding: dp(5)
+
+<CodeforcesConfigButton>:
+    user_font_size: "24sp"
+    tooltip_text: "Open Codeforces Configuration"
+
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self._rotation
+            origin: self.center
+
+    canvas.after:
+        PopMatrix
