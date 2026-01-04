@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 
 
 class CodeforcesGameView(MDRecycleView):
-
     notif_text = StringProperty("Test Notif")
     notif_pos = NumericProperty(0)
 
@@ -53,8 +52,8 @@ class CodeforcesGameView(MDRecycleView):
 class CodeforcesProblemHeader(BoxLayout):
     pass
 
-class CodeforcesConfigButton(MDIconButton):
 
+class CodeforcesConfigButton(MDIconButton):
     context_reference: "CodeforcesContext" = None
 
     handle_present = BooleanProperty(False)
@@ -120,8 +119,8 @@ class CodeforcesConfigButton(MDIconButton):
             return "file-account"
         return "file-cog"
 
-class CodeforcesProblemTopBoxes(MDRecycleView):
 
+class CodeforcesProblemTopBoxes(MDRecycleView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.data = []
@@ -129,16 +128,18 @@ class CodeforcesProblemTopBoxes(MDRecycleView):
     def set_problem_info(self, problem_data: dict[str, Any], problem_status: list[ProblemStatus]):
         new_data = []
         for i in range(len(problem_status)):
-            new_data.append({
-                "problem_name": problem_data[i]['name'],
-                "problem_url": problem_data[i]["url"],
-                "problem_state": problem_status[i].name,
-                "problem_idx": i + 1
-            })
+            new_data.append(
+                {
+                    "problem_name": problem_data[i]["name"],
+                    "problem_url": problem_data[i]["url"],
+                    "problem_state": problem_status[i].name,
+                    "problem_idx": i + 1,
+                }
+            )
         self.data = new_data
 
-class CodeforcesPreview(RecycleDataViewBehavior, Image):
 
+class CodeforcesPreview(RecycleDataViewBehavior, Image):
     COLOR_HIDDEN = (0.6, 0.6, 0.6, 0.4)
     COLOR_FULL_SOLVE = (0, 1, 0, 0.8)
     COLOR_AVAILABLE = (0.8, 0.8, 0.8, 0.6)
@@ -154,7 +155,6 @@ class CodeforcesPreview(RecycleDataViewBehavior, Image):
 
     def __init__(self, fit_mode="fill", **kwargs):
         super().__init__(fit_mode=fit_mode, **kwargs)
-
 
     def refresh_view_attrs(self, rv, index, data):
         self.index = index
@@ -177,7 +177,6 @@ class CodeforcesPreview(RecycleDataViewBehavior, Image):
 
 
 class CodeforcesProblemBox(MDRecycleView):
-
     game_reference: Game = None
 
     def __init__(self, **kwargs):
@@ -187,20 +186,22 @@ class CodeforcesProblemBox(MDRecycleView):
     def set_problem_info(self, problem_data: dict[str, Any], problem_status: list[ProblemStatus]):
         new_data = []
         for i in range(len(problem_status)):
-            new_data.append({
-                "problem_name": problem_data[i]['name'],
-                "problem_url": problem_data[i]["url"],
-                "problem_state": problem_status[i].name,
-                "problem_idx": i + 1
-            })
+            new_data.append(
+                {
+                    "problem_name": problem_data[i]["name"],
+                    "problem_url": problem_data[i]["url"],
+                    "problem_state": problem_status[i].name,
+                    "problem_idx": i + 1,
+                }
+            )
         self.data = new_data
 
     def check_resize(self, _: int, _1: int) -> None:
         parent_width, parent_height = self.parent.size
         self.size = parent_width, parent_height - 86
 
-class CodeforcesLabel(RecycleDataViewBehavior, BoxLayout):
 
+class CodeforcesLabel(RecycleDataViewBehavior, BoxLayout):
     index = None
 
     rv = ObjectProperty(None)
@@ -215,17 +216,19 @@ class CodeforcesLabel(RecycleDataViewBehavior, BoxLayout):
         self.index = index
         return super().refresh_view_attrs(rv, index, data)
 
-class CodeforcesUpgradeList(BoxLayout):
 
+class CodeforcesUpgradeList(BoxLayout):
     memory_val = StringProperty("1000")
     time_mult = NumericProperty(1)
     memory_string = StringProperty("1KB")
 
     def __init__(self):
         super().__init__()
+
         def on_change(inst, val):
             inst.memory_string = inst.calc_memory_string(val)
             # Trigger to begin
+
         on_change(self, self.memory_val)
         self.bind(memory_val=on_change)
 

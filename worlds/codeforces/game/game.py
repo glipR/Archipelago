@@ -20,6 +20,7 @@ class ProblemStatus(Enum):
     CLEARED = 4
     CLEARED_HIDDEN = 5
 
+
 class Game:
     random: Random
 
@@ -39,7 +40,7 @@ class Game:
         memory_upgrades: list[int | str],
         time_limit_upgrades: list[float],
         goal_solves: int,
-        problem_data: list[dict[str, Any]]
+        problem_data: list[dict[str, Any]],
     ) -> None:
         self.inventory = Counter()
         self.queued_events = []
@@ -69,9 +70,9 @@ class Game:
                 available = self.inventory[ITEM_NAME_TO_ID["Bank Key"]] >= bank
             else:
                 available = self.inventory[ITEM_NAME_TO_ID[f"Bank Key {bank}"]] > 0
-            location_track = LOCATION_NAME_TO_ID[f"Problem {i+1} Full Solve"]
+            location_track = LOCATION_NAME_TO_ID[f"Problem {i + 1} Full Solve"]
             checked = location_track in self.context.locations_checked
-            solved = self.context.stored_data.get(self.context.solved_key(i+1), False)
+            solved = self.context.stored_data.get(self.context.solved_key(i + 1), False)
             if not available:
                 if checked:
                     self.problem_status[i] = ProblemStatus.CLEARED_HIDDEN
@@ -87,17 +88,15 @@ class Game:
 
     @property
     def current_memory_limit(self):
-        return self.memory_upgrades[min(
-            len(self.memory_upgrades)-1,
-            self.inventory[ITEM_NAME_TO_ID["Memory Upgrade"]]
-        )]
+        return self.memory_upgrades[
+            min(len(self.memory_upgrades) - 1, self.inventory[ITEM_NAME_TO_ID["Memory Upgrade"]])
+        ]
 
     @property
     def current_time_limit(self):
-        return self.time_limit_upgrades[min(
-            len(self.time_limit_upgrades)-1,
-            self.inventory[ITEM_NAME_TO_ID["Time Limit Upgrade"]]
-        )]
+        return self.time_limit_upgrades[
+            min(len(self.time_limit_upgrades) - 1, self.inventory[ITEM_NAME_TO_ID["Time Limit Upgrade"]])
+        ]
 
     def render(self, manager: "CodeforcesManager"):
         self.hydrate_problem_status()
@@ -122,11 +121,10 @@ class Game:
             return f"Your submission is too large ({submission_bytes} Bytes)"
 
         # Checking time constraints
-        time_limit = self.problem_data[idx-1]["time_limit"]
+        time_limit = self.problem_data[idx - 1]["time_limit"]
         seconds_ratio = submission["timeConsumedMillis"] / 1000 / time_limit
         if seconds_ratio > self.current_time_limit:
             return f"Your submission took too long ({seconds_ratio * 100:.1f}% of {time_limit} seconds)"
-
 
     def problem_solved(self, idx: int):
         problem_solve = ProblemSolveEvent(idx)
@@ -135,11 +133,10 @@ class Game:
         self.queued_events.append(ConfettiFired(0.5, 0.5))
         self.queued_events.append(problem_solve)
 
-
     def check_goal_state(self):
         count_solved = 0
         for i in range(len(self.problem_data)):
-            solved = self.context.stored_data.get(self.context.solved_key(i+1), False)
+            solved = self.context.stored_data.get(self.context.solved_key(i + 1), False)
             count_solved += bool(solved)
         if len(self.problem_data) > 0 and count_solved * 100 > len(self.problem_data) * self.goal_solves:
             self.has_won = True

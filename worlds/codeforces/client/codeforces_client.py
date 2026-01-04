@@ -12,13 +12,21 @@ from settings import get_settings
 
 from kvui import KivyJSONtoTextParser
 
-from ..api import set_user_info, new_submissions, CFAPIError, set_last_checked_submission, get_last_checked_ts, default_last_checked_ts
+from ..api import (
+    set_user_info,
+    new_submissions,
+    CFAPIError,
+    set_last_checked_submission,
+    get_last_checked_ts,
+    default_last_checked_ts,
+)
 from ..game.events import ConfettiFired, LocationClearedEvent, VictoryEvent, ProblemSolveEvent
 from ..game.game import Game
 from .game_manager import CodeforcesManager
 
 if TYPE_CHECKING:
     import kvui
+
 
 class ConnectionStatus(Enum):
     NOT_CONNECTED = 0
@@ -28,7 +36,6 @@ class ConnectionStatus(Enum):
 
 
 class CodeforcesCommands(ClientCommandProcessor):
-
     ctx: "CodeforcesContext"
 
     def _cmd_clear_cf(self) -> bool:
@@ -65,9 +72,7 @@ class CodeforcesContext(CommonContext):
 
     ui: CodeforcesManager
 
-    def __init__(
-        self, server_address: str | None = None, password: str | None = None
-    ) -> None:
+    def __init__(self, server_address: str | None = None, password: str | None = None) -> None:
         super().__init__(server_address, password)
 
         self.queued_locations = []
@@ -96,22 +101,46 @@ class CodeforcesContext(CommonContext):
 
     async def solve_problem(self, index: int):
         self.stored_data[self.solved_key(index)] = True
-        await self.send_msgs([{"cmd": "Set", "key": self.solved_key(index),
-                               "default": False, "want_reply": False,
-                               "operations": [{"operation": "replace", "value": True}]}])
+        await self.send_msgs(
+            [
+                {
+                    "cmd": "Set",
+                    "key": self.solved_key(index),
+                    "default": False,
+                    "want_reply": False,
+                    "operations": [{"operation": "replace", "value": True}],
+                }
+            ]
+        )
 
     async def set_last_checked(self, ts: int):
         self.stored_data[self.last_checked_key()] = ts
-        await self.send_msgs([{"cmd": "Set", "key": self.last_checked_key(),
-                               "default": False, "want_reply": False,
-                               "operations": [{"operation": "replace", "value": ts}]}])
+        await self.send_msgs(
+            [
+                {
+                    "cmd": "Set",
+                    "key": self.last_checked_key(),
+                    "default": False,
+                    "want_reply": False,
+                    "operations": [{"operation": "replace", "value": ts}],
+                }
+            ]
+        )
 
     async def clear_check(self):
         set_last_checked_submission(default_last_checked_ts())
         self.stored_data[self.last_checked_key()] = get_last_checked_ts()
-        await self.send_msgs([{"cmd": "Set", "key": self.last_checked_key(),
-                               "default": False, "want_reply": False,
-                               "operations": [{"operation": "replace", "value": None}]}])
+        await self.send_msgs(
+            [
+                {
+                    "cmd": "Set",
+                    "key": self.last_checked_key(),
+                    "default": False,
+                    "want_reply": False,
+                    "operations": [{"operation": "replace", "value": None}],
+                }
+            ]
+        )
 
     def get_yaml_path(self):
         settings = get_settings()
@@ -128,10 +157,13 @@ class CodeforcesContext(CommonContext):
         cf_yaml = self.get_yaml_path()
 
         if not os.path.exists(cf_yaml):
-            self.gui_error("Configuration Error", f"The path you've specified for codeforces settings ({cf_yaml}) does not exist.")
+            self.gui_error(
+                "Configuration Error", f"The path you've specified for codeforces settings ({cf_yaml}) does not exist."
+            )
             return
 
         import yaml
+
         with open(cf_yaml, "r") as f:
             data = yaml.safe_load(f)
 
@@ -151,7 +183,7 @@ class CodeforcesContext(CommonContext):
             self.gui_error(
                 "Configuration error",
                 "Please press the icon in the top-right to specify your codeforces handle "
-                "[and api token, if you want automatic submission size detection]"
+                "[and api token, if you want automatic submission size detection]",
             )
 
     def handle_submission(self, submission):
@@ -213,9 +245,9 @@ class CodeforcesContext(CommonContext):
 
         except Exception as e:
             import traceback
+
             logger.exception(traceback.format_exc())
             raise e
-
 
     async def codeforces_loop(self) -> None:
         try:
@@ -276,6 +308,7 @@ class CodeforcesContext(CommonContext):
                 await asyncio.sleep(0.1)
         except Exception as e:
             import traceback
+
             logger.exception(traceback.format_exc())
             raise e
 
@@ -300,20 +333,18 @@ class CodeforcesContext(CommonContext):
             self.goal_solves = self.slot_data["goal_solves"]
             self.problem_data = self.slot_data["problems"]
 
-
             self.codeforces_game = Game(
                 self.progressive_keys,
                 self.memory_upgrades,
                 self.time_limit_upgrades,
                 self.goal_solves,
-                self.problem_data
+                self.problem_data,
             )
             self.codeforces_game.context = self
             self.highest_processed_item_index = 0
-            self.set_notify(*(
-                self.solved_key(i)
-                for i in range(1, len(self.problem_data)+1)
-            ), self.last_checked_key())
+            self.set_notify(
+                *(self.solved_key(i) for i in range(1, len(self.problem_data) + 1)), self.last_checked_key()
+            )
             self.render()
 
             self.connection_status = ConnectionStatus.SCOUTS_NOT_SENT
@@ -413,6 +444,7 @@ async def main(args: Namespace) -> None:
 
     await ctx.exit_event.wait()
     await ctx.shutdown()
+
 
 def launch(*args: str) -> None:
     from .launch import launch_codeforces_client

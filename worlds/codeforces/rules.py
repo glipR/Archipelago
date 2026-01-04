@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("Codeforces")
 
+
 def set_all_rules(world: CodeforcesWorld) -> None:
     # Entrance rules are handled by the location definition, since this rule is rather simple (Banks -> Keys)
     # set_all_entrance_rules(world)
@@ -19,8 +20,9 @@ def set_all_rules(world: CodeforcesWorld) -> None:
     set_completion_condition(world)
 
 
-def create_requirements_rule(world: CodeforcesWorld, reqs: list[tuple[str,int]]):
+def create_requirements_rule(world: CodeforcesWorld, reqs: list[tuple[str, int]]):
     return lambda state: all(state.has(v[0], world.player, v[1]) for v in reqs)
+
 
 def set_all_location_rules(world: CodeforcesWorld) -> None:
     problems = [(idx, prob) for idx, prob in enumerate(world.get_problems(), start=1)]
@@ -47,12 +49,13 @@ def set_all_location_rules(world: CodeforcesWorld) -> None:
             reqs.append((Upgrades.memory.value, expected_mem_upgrades))
         if expected_time_upgrades > 0:
             reqs.append((Upgrades.time_limit.value, expected_time_upgrades))
-        set_rule(loc, create_requirements_rule(world, reqs) )
-        set_rule(event, create_requirements_rule(world, reqs) )
+        set_rule(loc, create_requirements_rule(world, reqs))
+        set_rule(event, create_requirements_rule(world, reqs))
+
 
 def set_completion_condition(world: CodeforcesWorld) -> None:
     n_problems = len(world.get_problems())
     expected_solves = math.floor(n_problems / 100 * world.options.goal_solves.value)
-    world.multiworld.completion_condition[world.player] = (
-        lambda state: state.has("Problem Solve Key", world.player, expected_solves)
+    world.multiworld.completion_condition[world.player] = lambda state: state.has(
+        "Problem Solve Key", world.player, expected_solves
     )

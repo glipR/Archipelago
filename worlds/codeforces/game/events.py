@@ -10,6 +10,7 @@ class Event:
 class ProblemSolveEvent(Event):
     index: int
 
+
 @dataclass
 class LocationClearedEvent(Event):
     location_id: int

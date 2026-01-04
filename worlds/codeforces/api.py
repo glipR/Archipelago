@@ -16,6 +16,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from .world import CodeforcesWorld
 
+
 @dataclass
 class Problem:
     name: str
@@ -33,17 +34,15 @@ class Problem:
     @classmethod
     def from_json(cls, obj):
         name, contest_id, problem_index, rating, tags = (
-            obj.get("name"), obj.get("contestId"), obj.get("index"), obj.get("rating"), obj.get("tags")
+            obj.get("name"),
+            obj.get("contestId"),
+            obj.get("index"),
+            obj.get("rating"),
+            obj.get("tags"),
         )
         if name is None or contest_id is None or problem_index is None:
             return None
-        return Problem(
-            name,
-            rating,
-            tags or [],
-            contest_id,
-            problem_index
-        )
+        return Problem(name, rating, tags or [], contest_id, problem_index)
 
     @property
     def url(self):
@@ -68,16 +67,20 @@ class Problem:
         self.favour_score = 1 if len(self.tags) == 0 else rating / len(self.tags)
         return self.favour_score
 
+
 lookback_days = 7
 
 cf_username = ""
 cf_api_key = ""
 cf_api_secret = ""
 
+
 def default_last_checked_ts():
     return int(time.time()) - lookback_days * 24 * 60 * 60
 
+
 last_checked_submission = default_last_checked_ts()
+
 
 def set_user_info(username, api_key, api_secret):
     global cf_username, cf_api_key, cf_api_secret
@@ -85,20 +88,22 @@ def set_user_info(username, api_key, api_secret):
     cf_api_key = api_key
     cf_api_secret = api_secret
 
+
 def set_last_checked_submission(seconds: int):
     global last_checked_submission
     last_checked_submission = seconds
 
+
 def get_last_checked_ts():
     return last_checked_submission
+
 
 class CFAPIError(Exception):
     pass
 
+
 def makeApiSig(endpoint, kwargs: dict[str, Any]):
-    rand = "".join(random.choice(
-        string.ascii_uppercase + string.ascii_lowercase + string.digits
-    ) for _ in range(6))
+    rand = "".join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(6))
     # Query params need to be sorted for signature
     s = {}
     for k in sorted(kwargs.keys()):
@@ -107,6 +112,7 @@ def makeApiSig(endpoint, kwargs: dict[str, Any]):
     to_hash = f"{rand}/{endpoint}?{queries}#{cf_api_secret}"
     h = hashlib.sha512(to_hash.encode("utf-8"))
     return rand + h.hexdigest()
+
 
 def make_request(endpoint: str, **kwargs):
     try:
@@ -125,8 +131,10 @@ def make_request(endpoint: str, **kwargs):
     except Exception as e:
         from CommonClient import logger
         import traceback
+
         logger.exception(traceback.format_exc())
         raise e
+
 
 @lru_cache()
 def get_all_problems() -> list[Problem]:
@@ -138,8 +146,11 @@ def get_all_problems() -> list[Problem]:
 
     problems = obj.get("result", {}).get("problems", [])
     if len(problems) == 0:
-        raise ValueError(f"The request to codeforces failed, status code: {resp.status_code} and response: {str(resp.obj)}")
+        raise ValueError(
+            f"The request to codeforces failed, status code: {resp.status_code} and response: {str(resp.obj)}"
+        )
     return [pr for pr in [Problem.from_json(p) for p in problems] if pr is not None]
+
 
 async def new_submissions():
     """
@@ -184,15 +195,18 @@ async def new_submissions():
             subm["sourceCode"] = decoded
         yield subm
 
+
 def get_problem_time_limit(problem: Problem):
     from CommonClient import logger
+
     logger.info(f"Retrieving Time Limit for Problem: {problem.id}")
     return 1
     scraper = cloudscraper.create_scraper()
+
     def test_html():
         html = scraper.get(problem.url).text
         match = re.search(
-            r'time limit per test\s*</div>\s*(\d+)\s*second',
+            r"time limit per test\s*</div>\s*(\d+)\s*second",
             html,
             re.IGNORECASE,
         )
@@ -201,7 +215,7 @@ def get_problem_time_limit(problem: Problem):
             return int(match.group(1))
 
         easier_match = re.search(
-            r'(\d+)\s*second',
+            r"(\d+)\s*second",
             html,
             re.IGNORECASE,
         )
@@ -214,9 +228,11 @@ def get_problem_time_limit(problem: Problem):
         return test_html()
     except ValueError:
         import time
+
         # Try one more time, a bit later.
         time.sleep(3)
         return test_html()
+
 
 def generate_problems(world: "CodeforcesWorld") -> list[Problem]:
     """
@@ -248,8 +264,7 @@ def generate_problems(world: "CodeforcesWorld") -> list[Problem]:
 
     if len(problem_list) < world.options.number_of_problems:
         raise ValueError(
-            "Not enough problems available to generate problems. "
-            "Try loosening constraints or reducing #problems"
+            "Not enough problems available to generate problems. Try loosening constraints or reducing #problems"
         )
 
     accepted_failures = 20

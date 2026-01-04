@@ -25,11 +25,14 @@ if TYPE_CHECKING:
 
 def make_notif_animation(message, duration=0.5):
     anim = Animation(notif_pos=1, t="in_out_back", duration=duration)
+
     def on_start(animation, widget):
         widget.notif_text = message
-    anim.bind(on_start = on_start)
+
+    anim.bind(on_start=on_start)
     anim += Animation(duration=1.5) + Animation(notif_pos=0, t="in_out_back", duration=duration)
     return anim
+
 
 class CodeforcesManager(GameManager):
     base_title = "Codeforces for AP version"
@@ -93,7 +96,6 @@ class CodeforcesManager(GameManager):
 
             game_container.bind(size=self.codeforces_problem_box.check_resize)
 
-
             self.top_boxes = CodeforcesProblemTopBoxes()
             self.codeforces_header.add_widget(self.top_boxes)
             self.config_button = CodeforcesConfigButton()
@@ -104,6 +106,7 @@ class CodeforcesManager(GameManager):
 
         except Exception as e:
             import traceback
+
             logger.exception(traceback.format_exc())
             raise e
         return container
@@ -134,13 +137,14 @@ class CodeforcesManager(GameManager):
 
     def play_notif_anim(self, message: str, duration: float):
         anim = make_notif_animation(message, duration)
+
         def on_complete(animation, widget):
             self.playing_anim = None
             self.check_for_notif()
-        anim.bind(on_complete = on_complete)
+
+        anim.bind(on_complete=on_complete)
         self.playing_anim = anim
         self.playing_anim.start(self.game_view)
 
     def set_refreshing(self, refreshing: bool):
         self.config_button.refreshing = refreshing
-

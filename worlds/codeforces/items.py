@@ -8,27 +8,31 @@ from BaseClasses import Item, ItemClassification
 if TYPE_CHECKING:
     from .world import CodeforcesWorld
 
+
 # Item Bank 1 - 100: Possible problem locations
 # Item Bank 1001-1010: Upgrades
 class Upgrades(Enum):
     memory = "Memory Upgrade"
     time_limit = "Time Limit Upgrade"
     hint = "Problem Hint"
+
+
 # Item Bank 1101-1200: Filler
 class Fillers(Enum):
     words = "Words of Encouragement"
+
+
 # Item Bank 1201-1300: Trap
 class Traps(Enum):
     reading = "Reading Time"
+
 
 ITEM_NAME_TO_ID = {
     "Bank Key": 500,
     Upgrades.memory.value: 1001,
     Upgrades.time_limit.value: 1002,
     Upgrades.hint.value: 1003,
-
     Fillers.words.value: 1101,
-
     Traps.reading.value: 1201,
 }
 DEFAULT_ITEM_CLASSIFICATIONS = {
@@ -36,9 +40,7 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     Upgrades.memory.value: ItemClassification.progression_deprioritized,
     Upgrades.time_limit.value: ItemClassification.progression_deprioritized,
     Upgrades.hint.value: ItemClassification.useful,
-
     Fillers.words.value: ItemClassification.filler,
-
     Traps.reading.value: ItemClassification.trap,
 }
 for problem_index in range(1, 101):
@@ -47,10 +49,7 @@ for problem_index in range(1, 101):
     DEFAULT_ITEM_CLASSIFICATIONS[name] = ItemClassification.progression
 
 
-ID_TO_ITEM_NAME = {
-    v: k
-    for k, v in ITEM_NAME_TO_ID.items()
-}
+ID_TO_ITEM_NAME = {v: k for k, v in ITEM_NAME_TO_ID.items()}
 
 
 class CodeforcesItem(Item):
@@ -80,16 +79,14 @@ def create_all_items(world: CodeforcesWorld) -> None:
     itempool: list[Item] = [
         world.create_item("Bank Key" if world.options.progressive_keys else f"Bank Key {v}")
         for v in set(mapping.values())
-        if v != 1 # We ignore the first Bank key, since this will be given to the player on start.
+        if v != 1  # We ignore the first Bank key, since this will be given to the player on start.
     ]
 
     memory_upgrades = [
-        world.create_item(Upgrades.memory.value)
-        for _ in range(len(world.options.memory_upgrades.value) - 1)
+        world.create_item(Upgrades.memory.value) for _ in range(len(world.options.memory_upgrades.value) - 1)
     ]
     time_upgrades = [
-        world.create_item(Upgrades.time_limit.value)
-        for _ in range(len(world.options.time_limit_upgrades.value) - 1)
+        world.create_item(Upgrades.time_limit.value) for _ in range(len(world.options.time_limit_upgrades.value) - 1)
     ]
 
     memory_initial = 0
@@ -100,9 +97,13 @@ def create_all_items(world: CodeforcesWorld) -> None:
         # We need to give some memory/time upgrades to the player from the get-go.
         iters = 0
         while (
-            memory_initial < len(world.options.memory_upgrades.value) - 1 or
-            time_initial < len(world.options.time_limit_upgrades.value) - 1
-        ) and expected_items > number_of_unfilled_locations and iters < 100:
+            (
+                memory_initial < len(world.options.memory_upgrades.value) - 1
+                or time_initial < len(world.options.time_limit_upgrades.value) - 1
+            )
+            and expected_items > number_of_unfilled_locations
+            and iters < 100
+        ):
             if world.random.randint(0, 1) == 0 and memory_initial < len(world.options.memory_upgrades.value) - 1:
                 memory_initial += 1
                 expected_items -= 1

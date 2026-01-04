@@ -15,7 +15,7 @@ class CodeforcesSettings(settings.Group):
     class CodeforcesInfo(settings.OptionalUserFilePath):
         pass
 
-    codeforces_info : CodeforcesInfo = CodeforcesInfo("codeforces.yaml")
+    codeforces_info: CodeforcesInfo = CodeforcesInfo("codeforces.yaml")
 
 
 class CodeforcesWorld(World):
@@ -40,6 +40,7 @@ class CodeforcesWorld(World):
     item_name_to_id = items.ITEM_NAME_TO_ID
 
     origin_region_name = "Menu"
+
     def __init__(self, multiworld, player):
         super().__init__(multiworld, player)
         self.slot_problems = {}
@@ -65,16 +66,18 @@ class CodeforcesWorld(World):
                 prob_tuple_with_rating.sort()
 
             # saved_problems will be manually distributed instead.
-            saved_problems = ceil(
-                (100 - self.options.bank_size_variance) / 100 *
-                (len(problems) - generated_keys)
-            )
+            saved_problems = ceil((100 - self.options.bank_size_variance) / 100 * (len(problems) - generated_keys))
             remaining_problems = len(problems) - generated_keys - saved_problems
 
             # Now, assume that every key opens at least 1 problem, and find the breakpoints between key boundaries.
             breakpoints = [
-                b+i+ i * (saved_problems // generated_keys) + min(i+1, saved_problems % generated_keys)  # Final problem for key i.
-                for i, b in enumerate(sorted([self.random.randint(0, remaining_problems) for _ in range(generated_keys - 1)]))
+                b
+                + i
+                + i * (saved_problems // generated_keys)
+                + min(i + 1, saved_problems % generated_keys)  # Final problem for key i.
+                for i, b in enumerate(
+                    sorted([self.random.randint(0, remaining_problems) for _ in range(generated_keys - 1)])
+                )
             ]
             mapping = {}
             cur_index = 0
@@ -118,13 +121,7 @@ class CodeforcesWorld(World):
             "tag_preference_mapping",
             "goal_solves",
         )
-        obj_dict["problems"] = [
-            {
-                k: v
-                for k, v in asdict(p).items()
-            }
-            for p in problems
-        ]
+        obj_dict["problems"] = [{k: v for k, v in asdict(p).items()} for p in problems]
         for i, prob in enumerate(obj_dict["problems"]):
             prob["id"] = problems[i].id
             prob["url"] = problems[i].url

@@ -73,12 +73,14 @@ class HintChance(Range):
 
     This chance is global to all filler items
     """
+
     display_name = "Hint Chance"
 
     range_start = 0
     range_end = 100
 
     default = 50
+
 
 class TrapChance(Range):
     """
@@ -118,6 +120,7 @@ class NumberOfKeys(Range):
 
     Set to 1 to have access to all problems at once.
     """
+
     display_name = "Number of Keys"
     range_start = 1
     range_end = 100
@@ -138,11 +141,13 @@ class BankSizeVariance(Range):
     range_end = 100
     default = 50
 
+
 class ProgressiveKeys(Toggle):
     """
     Makes keys progressive, and problems ordered by rating
     (The first key you get will definitely unlock easier problems than the next key you get, and so on.)
     """
+
     display_name = "Progressive Keys"
 
 
@@ -198,6 +203,7 @@ class TagPreferenceMapping(OptionDict):
       # Problems containing geometry are banned
       geometry: -1
     """
+
     display_name = "Tag Preference Mapping"
 
 
@@ -205,11 +211,13 @@ class GoalSolves(Range):
     """
     The percentage of problems full solved to reach the goal for this game.
     """
+
     display_name = "Goal Solves"
 
     range_start = 1
     range_end = 100
     default = 80
+
 
 @dataclass
 class CodeforcesOptions(PerGameCommonOptions):
@@ -235,6 +243,6 @@ option_groups = [
     ),
     OptionGroup(
         "Gameplay Options",
-        [GoalSolves, NumberOfKeys, ProgressiveKeys, MemoryUpgrades, TimeLimitUpgrades, HintChance, TrapChance]
+        [GoalSolves, NumberOfKeys, ProgressiveKeys, MemoryUpgrades, TimeLimitUpgrades, HintChance, TrapChance],
     ),
 ]
