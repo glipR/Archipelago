@@ -1,0 +1,12 @@
+## Codeforces user settings
+# These are settings used to automatically track your submissions to codeforces
+# so that the client can automatically release locations for you.
+
+# Username: Required! - This is your handle on codeforces
+cf_username: ""
+# API Token: Optional - Without setting this, you will need to manually make sure you are following the
+# Memory Limit upgrade limit, because without this token we cannot view your submission code.
+# You can generate a key/secret here: https://codeforces.com/settings/api
+cf_api_key: ""
+cf_api_secret: ""
+
