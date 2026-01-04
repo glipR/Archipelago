@@ -1,6 +1,6 @@
 import asyncio
 import base64
-import cloudscraper
+from . import cloudscraper
 import re
 import requests
 import time
@@ -200,7 +200,6 @@ def get_problem_time_limit(problem: Problem):
     from CommonClient import logger
 
     logger.info(f"Retrieving Time Limit for Problem: {problem.id}")
-    return 1
     scraper = cloudscraper.create_scraper()
 
     def test_html():

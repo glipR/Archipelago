@@ -46,6 +46,22 @@ class CodeforcesCommands(ClientCommandProcessor):
         return True
 
 
+default_template_yaml = """\
+## Codeforces user settings
+# These are settings used to automatically track your submissions to codeforces
+# so that the client can automatically release locations for you.
+
+# Username: Required! - This is your handle on codeforces
+cf_username: ""
+# API Token: Optional - Without setting this, you will need to manually make sure you are following the
+# Memory Limit upgrade limit, because without this token we cannot view your submission code.
+# You can generate a key/secret here: https://codeforces.com/settings/api
+cf_api_key: ""
+cf_api_secret: ""
+
+"""
+
+
 class CodeforcesContext(CommonContext):
     game = "Codeforces"
     items_handling = 0b111  # full remote
@@ -88,10 +104,8 @@ class CodeforcesContext(CommonContext):
         cf_yaml = os.path.expanduser(str(cf_settings.codeforces_info))
         if not os.path.exists(cf_yaml):
             # Touch based on template
-            with open(Utils.local_path("worlds/codeforces/client/template_settings.yaml"), "r") as f:
-                content = f.read()
             with open(cf_yaml, "w") as f:
-                f.write(content)
+                f.write(default_template_yaml)
         self.collect_cf_info()
 
     def solved_key(self, index: int):
