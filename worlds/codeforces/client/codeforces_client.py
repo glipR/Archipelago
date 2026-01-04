@@ -9,6 +9,7 @@ import Utils
 from CommonClient import CommonContext, gui_enabled, logger, server_loop, ClientCommandProcessor
 from NetUtils import ClientStatus
 from settings import get_settings
+from Utils import parse_yaml
 
 from kvui import KivyJSONtoTextParser
 
@@ -162,10 +163,8 @@ class CodeforcesContext(CommonContext):
             )
             return
 
-        import yaml
-
         with open(cf_yaml, "r") as f:
-            data = yaml.safe_load(f)
+            data = parse_yaml(f)
 
         set_user_info(data.get("cf_username"), data.get("cf_api_key"), data.get("cf_api_secret"))
         if self.ui and self.ui.config_button:
