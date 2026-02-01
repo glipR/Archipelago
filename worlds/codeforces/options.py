@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionDict, OptionList
+from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionDict, OptionList, FreeText
 
 # For further reading on options, you can also read the Options API Document:
 # https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/options%20api.md
@@ -219,6 +219,17 @@ class GoalSolves(Range):
     default = 80
 
 
+class AvoidHandle(FreeText):
+    """
+    The codeforces handle of the user, so that generated problems can avoid problems they've already solved.
+
+    Optional!
+    """
+
+    display_name = "Avoid Handle"
+    default = ""
+
+
 @dataclass
 class CodeforcesOptions(PerGameCommonOptions):
     memory_upgrades: MemoryUpgrades
@@ -234,12 +245,13 @@ class CodeforcesOptions(PerGameCommonOptions):
     tag_preference_mapping: TagPreferenceMapping
     goal_solves: GoalSolves
     bank_size_variance: BankSizeVariance
+    avoid_handle: AvoidHandle
 
 
 option_groups = [
     OptionGroup(
         "Problem Selection Options",
-        [NumberOfProblems, RatingFloor, RatingCeiling, RatingSource, TagPreferenceMapping, BankSizeVariance],
+        [NumberOfProblems, RatingFloor, RatingCeiling, RatingSource, TagPreferenceMapping, BankSizeVariance, AvoidHandle],
     ),
     OptionGroup(
         "Gameplay Options",

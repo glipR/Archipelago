@@ -17,6 +17,8 @@ if TYPE_CHECKING:
     from .world import CodeforcesWorld
 
 
+logger = logging.getLogger(__name__)
+
 @dataclass
 class Problem:
     name: str
@@ -146,6 +148,7 @@ def make_request(endpoint: str, **kwargs):
 
 @lru_cache()
 def get_all_problems() -> list[Problem]:
+    logger.info("Retrieving all problems from Codeforces...")
     resp = make_request("problemset.problems")
     try:
         obj = resp.json()
@@ -212,6 +215,22 @@ async def new_submissions():
             subm["sourceCode"] = decoded
         yield subm
 
+def retrieve_all_user_submissions(handle):
+    logger.info(f"Retrieving all user submissions for {handle}...")
+    async def all_submissions():
+        set_user_info(handle, "", "")
+        # Feelsbad if you submitted to codeforces before 1970 ;)
+        set_last_checked_submission(0)
+        res = set()
+        async for submission in new_submissions():
+            if submission.get("verdict", None) == "OK":
+                problem = submission["problem"]
+                contestId = problem["contestId"]
+                index = problem["index"]
+                res.add(f"{contestId}/{index}")
+        return res
+
+    return asyncio.run(all_submissions())
 
 def get_problem_time_limit(problem: Problem):
     from CommonClient import logger
@@ -256,6 +275,18 @@ def generate_problems(world: "CodeforcesWorld") -> list[Problem]:
     """
 
     problem_list = get_all_problems()
+    logger.info(f"Retrieved {len(problem_list)} problems...")
+    user_solves = (
+        retrieve_all_user_submissions(world.options.avoid_handle.value)
+        if world.options.avoid_handle.value
+        else set()
+    )
+    logger.info(f"User has solved {len(user_solves)} problems. Removing from randomisation...")
+    problem_list = [
+        prob for prob in problem_list
+        if prob.id not in user_solves
+    ]
+    logger.info(f"Problems removed. New count: {len(problem_list)}")
 
     floor = world.options.rating_floor
     ceiling = world.options.rating_ceiling
