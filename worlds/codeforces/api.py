@@ -101,6 +101,12 @@ def get_last_checked_ts():
 class CFAPIError(Exception):
     pass
 
+class ApiSigError(CFAPIError):
+    pass
+
+class HandleError(CFAPIError):
+    pass
+
 
 def makeApiSig(endpoint, kwargs: dict[str, Any]):
     rand = "".join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(6))
@@ -169,6 +175,15 @@ async def new_submissions():
             kwargs["includeSources"] = "true"
         resp = make_request("user.status", **kwargs)
         obj = resp.json()
+        if ("result" not in obj):
+            comment = obj.get("comment", "")
+            if "apiKey: Incorrect signature" in comment:
+                raise ApiSigError(comment)
+            elif "apiKey: Incorrect API key" in comment:
+                raise ApiSigError(comment)
+            elif "includeSources: You can only include sources for your own submissions" in comment:
+                raise HandleError(comment)
+            raise ValueError(f"Error! {obj}")
         if len(obj["result"]) == 0:
             end_found = True
             continue

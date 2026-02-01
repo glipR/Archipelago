@@ -16,7 +16,9 @@ from kvui import KivyJSONtoTextParser
 from ..api import (
     set_user_info,
     new_submissions,
+    ApiSigError,
     CFAPIError,
+    HandleError,
     set_last_checked_submission,
     get_last_checked_ts,
     default_last_checked_ts,
@@ -192,6 +194,20 @@ class CodeforcesContext(CommonContext):
                 self.handle_submission(submission)
                 await asyncio.sleep(0.05)
             await self.set_last_checked(get_last_checked_ts())
+        except ApiSigError as e:
+            print(e.args)
+            self.gui_error(
+                "Configuration error",
+                "Your API Key / API Secret Pair is incorrect. "
+                "To be safe, please make sure to wrap both values in quotations marks (Like: \"secret\")"
+            )
+        except HandleError as e:
+            print(e.args)
+            self.gui_error(
+                "Configuration error",
+                "Your codeforces handle is not the same as the user which generated the key/secret pair. "
+                "Please check that your codeforces handle is spelled correctly."
+            )
         except CFAPIError:
             self.gui_error(
                 "Configuration error",
