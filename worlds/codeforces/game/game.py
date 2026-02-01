@@ -138,7 +138,7 @@ class Game:
         for i in range(len(self.problem_data)):
             solved = self.context.stored_data.get(self.context.solved_key(i + 1), False)
             count_solved += bool(solved)
-        if len(self.problem_data) > 0 and count_solved * 100 > len(self.problem_data) * self.goal_solves:
+        if len(self.problem_data) > 0 and count_solved * 100 >= len(self.problem_data) * self.goal_solves:
             self.has_won = True
 
     def force_clear_location(self, idx: int):
