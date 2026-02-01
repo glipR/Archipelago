@@ -17,8 +17,9 @@ from ..api import (
     set_user_info,
     new_submissions,
     ApiSigError,
-    CFAPIError,
     HandleError,
+    MissingConfiguration,
+    UnknownError,
     set_last_checked_submission,
     get_last_checked_ts,
     default_last_checked_ts,
@@ -208,12 +209,21 @@ class CodeforcesContext(CommonContext):
                 "Your codeforces handle is not the same as the user which generated the key/secret pair. "
                 "Please check that your codeforces handle is spelled correctly."
             )
-        except CFAPIError:
+        except MissingConfiguration:
             self.gui_error(
                 "Configuration error",
                 "Please press the icon in the top-right to specify your codeforces handle "
                 "[and api token, if you want automatic submission size detection]",
             )
+        except UnknownError:
+            import traceback
+            logger.exception(traceback.format_exc())
+            self.gui_error(
+                "API error",
+                "An error occurred when querying the codeforces API. "
+                "Please check the log for issues."
+            )
+
 
     def handle_submission(self, submission):
         name = submission["problem"]["name"]

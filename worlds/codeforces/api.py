@@ -101,10 +101,16 @@ def get_last_checked_ts():
 class CFAPIError(Exception):
     pass
 
+class MissingConfiguration(CFAPIError):
+    pass
+
 class ApiSigError(CFAPIError):
     pass
 
 class HandleError(CFAPIError):
+    pass
+
+class UnknownError(CFAPIError):
     pass
 
 
@@ -123,7 +129,7 @@ def makeApiSig(endpoint, kwargs: dict[str, Any]):
 def make_request(endpoint: str, **kwargs):
     try:
         if not cf_username and ("{user}" in endpoint or any("{user}" in v for v in kwargs.values())):
-            raise CFAPIError("User not configured.")
+            raise MissingConfiguration("User not configured.")
         endpoint = endpoint.format(user=cf_username)
         for k in kwargs.keys():
             kwargs[k] = kwargs[k].format(user=cf_username)
@@ -135,11 +141,7 @@ def make_request(endpoint: str, **kwargs):
         resp = requests.get(f"https://codeforces.com/api/{endpoint}?{urlencode(kwargs)}")
         return resp
     except Exception as e:
-        from CommonClient import logger
-        import traceback
-
-        logger.exception(traceback.format_exc())
-        raise e
+        raise UnknownError() from e
 
 
 @lru_cache()
