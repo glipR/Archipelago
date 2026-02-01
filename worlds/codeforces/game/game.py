@@ -116,7 +116,7 @@ class Game:
         specified by current upgrade state.
         """
         # Checking memory constraints
-        submission_bytes = len(submission["sourceCode"].encode("utf-8"))
+        submission_bytes = len(submission["sourceCode"].encode("utf-8")) if "sourceCode" in submission else 0
         if self.current_memory_limit != "inf" and submission_bytes > self.current_memory_limit:
             return f"Your submission is too large ({submission_bytes} Bytes)"
 
