@@ -304,7 +304,6 @@ class CodeforcesContext(CommonContext):
 
                     while self.queued_locations:
                         location = self.queued_locations.pop(0)
-                        self.location_checked_side_effects(location)
                         self.locations_checked.add(location)
                         rerender = True
                         await self.check_locations({location})
